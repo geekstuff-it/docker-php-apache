@@ -9,7 +9,8 @@ ARG PHP_USER_NAME=php
 ARG PHP_USER_ID=1000
 
 # ENVs
-ENV APACHE_INDEX=index.php \
+ENV APACHE_ALLOW_OVERRIDE=All \
+    APACHE_INDEX=index.php \
     APACHE_DOCUMENT_ROOT=/app \
     APACHE_PORT_HTTP=8080 \
     APACHE_SERVER_TOKENS=Minor \
@@ -32,13 +33,19 @@ RUN apt-get update && apt-get install -yq \
 
 # Apache
 COPY vhost.conf /etc/apache2/sites-available/default.conf
-RUN rm /etc/apache2/sites-available/000-default.conf \
+RUN a2dissite 000-default \
+ && a2dissite default-ssl \
+ && rm \
+    /etc/apache2/sites-available/000-default.conf \
+    /etc/apache2/sites-available/default-ssl.conf \
+ && a2ensite default \
  && a2enmod rewrite \
  && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
  && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
  && sed -ri -e 's/^Listen 80$/Listen ${APACHE_PORT_HTTP}/g' /etc/apache2/ports.conf \
  && sed -ri -e 's/^ServerTokens .*/ServerTokens ${APACHE_SERVER_TOKENS}/g' /etc/apache2/conf-available/security.conf \
- && sed -ri -e 's/^ServerSignature .*/ServerSignature ${APACHE_SERVER_SIGNATURE}/g' /etc/apache2/conf-available/security.conf
+ && sed -ri -e 's/^ServerSignature .*/ServerSignature ${APACHE_SERVER_SIGNATURE}/g' /etc/apache2/conf-available/security.conf \
+ && chown -R ${PHP_USER_NAME}: /etc/apache2 /var/lib/apache2 /var/log/apache2 /var/run/apache2 /var/lock/apache2 /var/cache/apache2
 
 # PHP
 COPY php.ini /usr/local/etc/php/conf.d/php.ini
@@ -52,10 +59,13 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
  && rm -rf /var/lib/apt/lists/* \
  && docker-php-ext-configure intl \
- && docker-php-ext-install intl \
- && docker-php-ext-install json \
- && docker-php-ext-install pcntl \
- && docker-php-ext-install zip
+ && docker-php-ext-install \
+    intl \
+    json \
+    pcntl \
+    opcache\
+    sockets\
+    zip
 
 # Letting extensions of this box switch to this user if they want to
 # USER ${PHP_USER_NAME}
