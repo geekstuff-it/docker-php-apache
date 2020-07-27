@@ -1,5 +1,4 @@
-# https://github.com/docker-library/php/blob/86c8ec4d387132b65dbe6c5ab1747f858e03852e/7.4/buster/apache/Dockerfile
-ARG PHP_VERSION_TAG=7.4-apache
+ARG PHP_VERSION_TAG=apache
 FROM php:${PHP_VERSION_TAG}
 
 # ARGS
