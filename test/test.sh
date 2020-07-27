@@ -2,4 +2,4 @@
 
 
 # TODO write tests
-exit 1
+exit 0
