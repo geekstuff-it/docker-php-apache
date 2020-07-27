@@ -5,7 +5,39 @@ services:
     build:
       context: test/
     links:
-      - web
-  web:
+      - php
+      #- php71
+      #- php72
+      #- php73
+      #- php74
+  php:
     build: .
     user: php
+
+# The following is probably not the best way to go about it. It would run 4x this image at once.
+# Keeping as a note until we try test hooks.
+#
+  #php71:
+  #  user: php
+  #  build:
+  #    context: .
+  #    args:
+  #      PHP_VERSION_TAG: 7.1-apache
+  #php72:
+  #  user: php
+  #  build:
+  #    context: .
+  #    args:
+  #      PHP_VERSION_TAG: 7.2-apache
+  #php73:
+  #  user: php
+  #  build:
+  #    context: .
+  #    args:
+  #      PHP_VERSION_TAG: 7.3-apache
+  #php74:
+  #  user: php
+  #  build:
+  #    context: .
+  #    args:
+  #      PHP_VERSION_TAG: 7.4-apache
