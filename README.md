@@ -6,6 +6,9 @@ This is a work in progress for now. Will get cleaned up over time.
 
 
 ## TODO
+- Consider using www-data user in prod context but php user in dev context.
+  Using that user id 1000 helps in dev, and not using root is a good idea too.
+  (see upcoming usage example)
 
 ### Write tests
 
