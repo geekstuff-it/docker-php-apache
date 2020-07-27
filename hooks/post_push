@@ -1,10 +1,8 @@
 #!/bin/bash
 
 
-set -e
-
 # grab latest tags
-PHP_TAGS=$(curl 'https://registry.hub.docker.com/v2/repositories/library/php/tags?page_size=1024' | grep -Po "[0-9]+\.[0-9]+\.[0-9]+" | sort | uniq)
+PHP_TAGS=$(curl 'https://registry.hub.docker.com/v2/repositories/library/php/tags?page_size=1024' | grep -Po "[0-9]+\.[0-9]+\.[0-9]+-apache" | sed 's/-apache//' | sort | uniq)
 
 if [ $DOCKER_TAG == "latest" ]; then
 
