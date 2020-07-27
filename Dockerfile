@@ -2,9 +2,9 @@
 ARG PHP_VERSION_TAG=7.4-apache
 FROM php:${PHP_VERSION_TAG}
 
-LABEL MAINTAINER="<geekstuff.it>"
-
 # ARGS
+## Using user ID 1000 so that when this base box is used during development and volumes are mounted by devs,
+## ID 1000 will likely match that dev ID as well.
 ARG PHP_USER_NAME=php
 ARG PHP_USER_ID=1000
 
@@ -63,9 +63,11 @@ RUN apt-get update && apt-get install -y \
     intl \
     json \
     pcntl \
-    opcache\
-    sockets\
-    zip
+    opcache \
+    sockets \
+    zip \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
 # Letting extensions of this box switch to this user if they want to
 # USER ${PHP_USER_NAME}
