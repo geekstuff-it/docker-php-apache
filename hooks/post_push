@@ -4,7 +4,6 @@
 set -e
 
 if [ $DOCKER_TAG == "latest" ]; then
-  docker push $IMAGE_NAME
   docker push $DOCKER_REPO:7.1-latest
   docker push $DOCKER_REPO:7.2-latest
   docker push $DOCKER_REPO:7.3-latest
