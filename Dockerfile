@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -yq \
  && rm -rf /var/lib/apt/lists/*
 
 # Apache
-COPY vhost.conf /etc/apache2/sites-available/default.conf
+COPY assets/vhost.conf /etc/apache2/sites-available/default.conf
 RUN a2dissite 000-default \
  && a2dissite default-ssl \
  && rm \
@@ -47,7 +47,7 @@ RUN a2dissite 000-default \
  && chown -R ${PHP_USER_NAME}: /etc/apache2 /var/lib/apache2 /var/log/apache2 /var/run/apache2 /var/lock/apache2 /var/cache/apache2
 
 # PHP
-COPY php.ini /usr/local/etc/php/conf.d/php.ini
+COPY assets/php.ini /usr/local/etc/php/conf.d/php.ini
 
 ## Extensions
 
