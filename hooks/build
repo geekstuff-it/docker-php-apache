@@ -1,16 +1,52 @@
 #!/bin/bash
 
 
+# grab latest tags
+PHP_TAGS=$(curl 'https://registry.hub.docker.com/v2/repositories/library/php/tags?page_size=1024' | grep -Po "[0-9]+\.[0-9]+\.[0-9]+" | sort | uniq)
 
 if [ $DOCKER_TAG == "latest" ]; then
   docker build -f $DOCKERFILE_PATH -t ${IMAGE_NAME} .
-  docker build --build-arg PHP_VERSION_TAG=7.1-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.1-latest .
-  docker build --build-arg PHP_VERSION_TAG=7.2-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.2-latest .
-  docker build --build-arg PHP_VERSION_TAG=7.3-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.3-latest .
-  docker build --build-arg PHP_VERSION_TAG=7.4-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.4-latest .
+
+  for PHP_MAJOR in $(echo "$PHP_TAGS" | grep -Po "^[0-9]+" | sort | uniq); do
+    echo "##### Build ${PHP_MAJOR}-latest (x-latest) #####"
+    docker build --build-arg PHP_VERSION_TAG=${PHP_MAJOR}-apache -f ${DOCKERFILE_PATH} -t ${DOCKER_REPO}:${PHP_MAJOR}-latest .
+  done
+
+  for PHP_MINOR in $(echo "$PHP_TAGS" | grep -Po "^[0-9]+\.[0-9]+" | sort | uniq); do
+    echo "##### Build ${PHP_MINOR}-latest (x.y-latest) #####"
+    docker build --build-arg PHP_VERSION_TAG=${PHP_MINOR}-apache -f ${DOCKERFILE_PATH} -t ${DOCKER_REPO}:${PHP_MINOR}-latest .
+  done
+
+  for PHP_VERSION in $(echo "$PHP_TAGS"); do
+    echo "##### Build $PHP_VERSION (x.y.z) #####"
+    docker build --build-arg PHP_VERSION_TAG=${PHP_VERSION}-apache -f ${DOCKERFILE_PATH} -t ${DOCKER_REPO}:${PHP_VERSION} .
+  done
+
+  #docker build --build-arg PHP_VERSION_TAG=7.1-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.1-latest .
+  #docker build --build-arg PHP_VERSION_TAG=7.2-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.2-latest .
+  #docker build --build-arg PHP_VERSION_TAG=7.3-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.3-latest .
+  #docker build --build-arg PHP_VERSION_TAG=7.4-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.4-latest .
 else
-  docker build --build-arg PHP_VERSION_TAG=7.1-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.1-$DOCKER_TAG .
-  docker build --build-arg PHP_VERSION_TAG=7.2-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.2-$DOCKER_TAG .
-  docker build --build-arg PHP_VERSION_TAG=7.3-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.3-$DOCKER_TAG .
-  docker build --build-arg PHP_VERSION_TAG=7.4-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.4-$DOCKER_TAG .
+  # I think we kind of have to build that default ~UI~ box. Naming it x-*
+  docker build --build-arg PHP_VERSION_TAG=apache -f ${DOCKERFILE_PATH} -t ${DOCKER_REPO}:x-${DOCKER_TAG} .
+
+  for PHP_MAJOR in $(echo "$PHP_TAGS" | grep -Po "^[0-9]+" | sort | uniq); do
+    echo "##### Build ${PHP_MAJOR}-${DOCKER_TAG} (phpVersion-basePhpApacheVersion) #####"
+    docker build --build-arg PHP_VERSION_TAG=${PHP_MAJOR}-apache -f ${DOCKERFILE_PATH} -t ${DOCKER_REPO}:${PHP_MAJOR}-${DOCKER_TAG} .
+  done
+
+  for PHP_MINOR in $(echo "$PHP_TAGS" | grep -Po "^[0-9]+\.[0-9]+" | sort | uniq); do
+    echo "##### Build ${PHP_MINOR}-latest (x.y-latest) #####"
+    docker build --build-arg PHP_VERSION_TAG=${PHP_MINOR}-apache -f ${DOCKERFILE_PATH} -t ${DOCKER_REPO}:${PHP_MINOR}-${DOCKER_TAG} .
+  done
+
+  for PHP_VERSION in $(echo "$PHP_TAGS"); do
+    echo "##### Build $PHP_VERSION (x.y.z) #####"
+    docker build --build-arg PHP_VERSION_TAG=${PHP_VERSION}-apache -f ${DOCKERFILE_PATH} -t ${DOCKER_REPO}:${PHP_VERSION}-${DOCKER_TAG} .
+  done
+
+  #docker build --build-arg PHP_VERSION_TAG=7.1-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.1-$DOCKER_TAG .
+  #docker build --build-arg PHP_VERSION_TAG=7.2-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.2-$DOCKER_TAG .
+  #docker build --build-arg PHP_VERSION_TAG=7.3-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.3-$DOCKER_TAG .
+  #docker build --build-arg PHP_VERSION_TAG=7.4-apache -f $DOCKERFILE_PATH -t $DOCKER_REPO:7.4-$DOCKER_TAG .
 fi
