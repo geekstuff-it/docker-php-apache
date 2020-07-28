@@ -4,6 +4,8 @@ Base docker image for docker apache mod-php.
 
 This is a work in progress for now. Will get cleaned up over time.
 
+![Docker build status](https://github.com/geekstuff-it/docker-php-apache/workflows/Docker/badge.svg)
+(test status is irrelevant for now has there are no tests written yet)
 
 ## TODO
 - Consider using www-data user in prod context but php user in dev context.
