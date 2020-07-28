@@ -17,7 +17,6 @@ getBuildParams() {
     if [ $IS_MASTER_BUILD -eq 1 ]; then
       echo "${PHP_MINOR}-apache|php${PHP_MINOR}"
     elif [ $IS_RELEASE_BUILD -eq 1 ]; then
-      echo "${PHP_MINOR}-apache|php${PHP_MINOR}-v${MAJOR_RELEASE}"
       echo "${PHP_MINOR}-apache|php${PHP_MINOR}-v${MINOR_RELEASE}"
       echo "${PHP_MINOR}-apache|php${PHP_MINOR}-v${RELEASE}"
     fi
@@ -25,7 +24,6 @@ getBuildParams() {
 
   for PHP_VERSION in $(echo "$PHP_TAGS"); do
     if [ $IS_RELEASE_BUILD -eq 1 ]; then
-      echo "${PHP_VERSION}-apache|php${PHP_VERSION}-v${MAJOR_RELEASE}"
       echo "${PHP_VERSION}-apache|php${PHP_VERSION}-v${MINOR_RELEASE}"
       echo "${PHP_VERSION}-apache|php${PHP_VERSION}-v${RELEASE}"
     fi
