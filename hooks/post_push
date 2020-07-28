@@ -1,37 +1,12 @@
 #!/bin/bash
 
 
-# grab latest tags
-PHP_TAGS=$(curl 'https://registry.hub.docker.com/v2/repositories/library/php/tags?page_size=1024' | grep -Po "[0-9]+\.[0-9]+\.[0-9]+-apache" | sed 's/-apache//' | sort | uniq)
-IS_MASTER_BUILD=$([ "$SOURCE_BRANCH" == "master" ] && echo 1 || echo 0)
+SCRIPT_DIR="$(dirname "$0")"
+source "${SCRIPT_DIR}/common"
 
-if [ $IS_MASTER_BUILD -eq 1 ]; then
 
-  for PHP_MINOR in $(echo "$PHP_TAGS" | grep -Po "^[0-9]+\.[0-9]+" | sort | uniq); do
-    echo "##### Push ${PHP_MINOR} #####"
-    docker push ${DOCKER_REPO}:${PHP_MINOR}
-  done
-
-  for PHP_VERSION in $(echo "$PHP_TAGS"); do
-    echo "##### Push $PHP_VERSION (x.y.z) #####"
-    docker push ${DOCKER_REPO}:${PHP_VERSION}
-  done
-
-else
-
-  CURRENT_RELEASE=$(echo $SOURCE_BRANCH | cut -c2-)
-
-  for PHP_MINOR in $(echo "$PHP_TAGS" | grep -Po "^[0-9]+\.[0-9]+" | sort | uniq); do
-    SHORT_DOCKER_TAG=$(echo $CURRENT_RELEASE | cut -d'.' -f-2)
-    CUSTOM_IMAGE_NAME="${DOCKER_REPO}:php${PHP_MINOR}-v${SHORT_DOCKER_TAG}"
-    echo "##### Push $CUSTOM_IMAGE_NAME #####"
-    docker push -t ${CUSTOM_IMAGE_NAME}
-  done
-
-  for PHP_VERSION in $(echo "$PHP_TAGS"); do
-    CUSTOM_IMAGE_NAME="${DOCKER_REPO}:php${PHP_VERSION}-v${CURRENT_RELEASE}"
-    echo "##### Push $CUSTOM_IMAGE_NAME #####"
-    docker push -t ${CUSTOM_IMAGE_NAME}
-  done
-
-fi
+for BUILD_PARAMS in $(getBuildParams); do
+  TAG=$(echo $BUILD_PARAMS | cut -d'|' -f2)
+  echo "##### Push tag ${TAG} #####"
+  echo docker push ${DOCKER_REPO}:${TAG}
+done
