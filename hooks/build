@@ -6,7 +6,7 @@ PHP_TAGS=$(curl 'https://registry.hub.docker.com/v2/repositories/library/php/tag
 
 if [ $DOCKER_TAG == "latest" ]; then
 
-  docker build -f $DOCKERFILE_PATH -t ${IMAGE_NAME} .
+  docker build --build-arg PHP_VERSION_TAG=${PHP_VERSION_TAG} -f $DOCKERFILE_PATH -t ${IMAGE_NAME} .
 
   for PHP_MAJOR in $(echo "$PHP_TAGS" | grep -Po "^[0-9]+" | sort | uniq); do
     echo "##### Build ${PHP_MAJOR}-latest (x-latest) #####"
@@ -26,7 +26,7 @@ if [ $DOCKER_TAG == "latest" ]; then
 else
 
   # I think we kind of have to build that default ~UI~ box. Naming it x-*
-  docker build --build-arg PHP_VERSION_TAG=apache -f ${DOCKERFILE_PATH} -t ${DOCKER_REPO}:${DOCKER_TAG} .
+  docker build --build-arg PHP_VERSION_TAG=${PHP_VERSION_TAG} -f ${DOCKERFILE_PATH} -t ${DOCKER_REPO}:${DOCKER_TAG} .
 
   for PHP_MAJOR in $(echo "$PHP_TAGS" | grep -Po "^[0-9]+" | sort | uniq); do
     echo "##### Build ${PHP_MAJOR}-${DOCKER_TAG} (phpVersion-basePhpApacheVersion) #####"
